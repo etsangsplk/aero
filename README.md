@@ -7,32 +7,81 @@ Backoff
 ----------
 
 ```go
+// backoffer.go
 
-b := backoff.NewExp()
-b.InitialDelay = 100 * time.Millisecond
-b.MaxDelay = 500 * time.Millisecond
-b.FailAfter = 10
-b.JitterBefore = 0.01
-b.JitterAfter = 0.2
+package main
 
-// ...
+import (
+    "fmt"
+    "github.com/mceldeen/aero/backoff"
+    "time"
+)
 
-var res *http.Response
-var err error
+var succeed = uint(8)
 
-n := uint(0)
-for delay, next := b.Next(n); next; delay, next = b.Next(n) {
-    res, err = do(req)
-
-    if err == nil {
-        return res, err
+func do(n uint) bool {
+    if n == succeed {
+        return true
     }
 
-    <-time.After(delay)
-    n++
+    return false
 }
 
-return res,err
+func main() {
+    b := backoff.NewExp()
+    b.InitialDelay = 10 * time.Millisecond
+    b.MaxDelay = 1000 * time.Millisecond
+    b.FailAfter = 10
+
+    n := uint(0)
+    for delay, next := b.Next(n); next; delay, next = b.Next(n) {
+        fmt.Printf("do request %d...", n)
+
+        if do(n) {
+            fmt.Println("success")
+            return
+        }
+
+        fmt.Println("failed")
+
+        fmt.Printf("wait %s...\n\n", delay)
+        <-time.After(delay)
+        n++
+    }
+
+    fmt.Println("too many requests")
+}
+
+```
+
+```Shell
+$ go run backoffer.go
+do request 0...failed
+wait 10ms...
+
+do request 1...failed
+wait 20ms...
+
+do request 2...failed
+wait 40ms...
+
+do request 3...failed
+wait 80ms...
+
+do request 4...failed
+wait 160ms...
+
+do request 5...failed
+wait 320ms...
+
+do request 6...failed
+wait 640ms...
+
+do request 7...failed
+wait 1s...
+
+do request 8...success
+
 ```
 
 Ratelimit
@@ -65,7 +114,7 @@ func main() {
 }
 ```
 
-```Bash
+```Shell
 $ go run limiter.go
 request 1 2014-01-04 16:22:42.695883641 -0700 MST
 request 2 2014-01-04 16:22:42.695965085 -0700 MST
