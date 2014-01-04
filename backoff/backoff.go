@@ -60,6 +60,10 @@ func (b *Exp) Next(fails uint) (delay time.Duration, tryAgain bool) {
         tryAgain = false
     }
 
+    if fails == b.FailAfter-1 {
+        delay = 0
+    }
+
     if delay > b.MaxDelay {
         delay = b.MaxDelay
     }

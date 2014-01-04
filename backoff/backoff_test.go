@@ -18,7 +18,7 @@ func TestExpBackoff(t *testing.T) {
         640 * time.Millisecond,
         1000 * time.Millisecond,
         1000 * time.Millisecond,
-        1000 * time.Millisecond,
+        0 * time.Millisecond,
     }
 
     b := NewExp()
@@ -43,7 +43,7 @@ func TestExpBackoff(t *testing.T) {
         []time.Duration{576 * time.Millisecond, 768 * time.Millisecond},
         []time.Duration{900 * time.Millisecond, 1200 * time.Millisecond},
         []time.Duration{900 * time.Millisecond, 1200 * time.Millisecond},
-        []time.Duration{900 * time.Millisecond, 1200 * time.Millisecond},
+        []time.Duration{0 * time.Millisecond, 0 * time.Millisecond},
     }
     b.JitterBefore = 0.1
     b.JitterAfter = 0.2
