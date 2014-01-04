@@ -65,7 +65,7 @@ func main() {
 }
 ```
 
-```Shell
+```Bash
 $ go run limiter.go
 request 1 2014-01-04 16:22:42.695883641 -0700 MST
 request 2 2014-01-04 16:22:42.695965085 -0700 MST
