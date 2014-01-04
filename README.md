@@ -7,7 +7,6 @@ Backoff
 ----------
 
 ```go
-// ...
 
 b := backoff.NewExp()
 b.InitialDelay = 100 * time.Millisecond
@@ -15,6 +14,8 @@ b.MaxDelay = 500 * time.Millisecond
 b.FailAfter = 10
 b.JitterBefore = 0.01
 b.JitterAfter = 0.2
+
+// ...
 
 var res *http.Response
 var err error
