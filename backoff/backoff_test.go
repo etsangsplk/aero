@@ -7,7 +7,7 @@ import (
     "time"
 )
 
-func TestDefaultExponentialBackoff(t *testing.T) {
+func TestExpBackoff(t *testing.T) {
     delays := []time.Duration{
         10 * time.Millisecond,
         20 * time.Millisecond,
@@ -21,10 +21,10 @@ func TestDefaultExponentialBackoff(t *testing.T) {
         1000 * time.Millisecond,
     }
 
-    b := NewExponential()
-    b.InitialDelay(10 * time.Millisecond)
-    b.MaxDelay(1000 * time.Millisecond)
-    b.FailAfter(10)
+    b := NewExp()
+    b.InitialDelay = 10 * time.Millisecond
+    b.MaxDelay = 1000 * time.Millisecond
+    b.FailAfter = 10
     n := uint(0)
     for delay, next := b.Next(n); next; delay, next = b.Next(n) {
         assert.Equal(t, delays[n], delay, fmt.Sprintf("%d", n))
@@ -45,13 +45,13 @@ func TestDefaultExponentialBackoff(t *testing.T) {
         []time.Duration{900 * time.Millisecond, 1200 * time.Millisecond},
         []time.Duration{900 * time.Millisecond, 1200 * time.Millisecond},
     }
-    b.Jitter(0.1, 0.2)
+    b.JitterBefore = 0.1
+    b.JitterAfter = 0.2
 
     // min
     b.rand = func() float64 {
         return 0.0
     }
-    b.Reset()
     n = 0
     for delay, next := b.Next(n); next; delay, next = b.Next(n) {
         assert.Equal(t, delayRanges[n][0], delay)
@@ -62,7 +62,6 @@ func TestDefaultExponentialBackoff(t *testing.T) {
     b.rand = func() float64 {
         return 1.0
     }
-    b.Reset()
     n = 0
     for delay, next := b.Next(n); next; delay, next = b.Next(n) {
         assert.Equal(t, delayRanges[n][1], delay)
