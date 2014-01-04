@@ -50,9 +50,10 @@ func (l *Bursty) start(burst int) {
         for {
             select {
             case now := <-ticker.C:
-                go func() {
-                    l.c <- now
-                }()
+                select {
+                case l.c <- now:
+                default:
+                }
             case <-l.cls:
                 return
             }
