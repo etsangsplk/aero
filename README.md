@@ -16,10 +16,12 @@ b.FailAfter = 10
 b.JitterBefore = 0.01
 b.JitterAfter = 0.2
 
+var res *http.Response
+var err error
 
 n := uint(0)
 for delay, next := b.Next(n); next; delay, next = b.Next(n) {
-    res, err := do(req)
+    res, err = do(req)
 
     if err == nil {
         return res, err
@@ -28,4 +30,6 @@ for delay, next := b.Next(n); next; delay, next = b.Next(n) {
     <-time.After(delay)
     n++
 }
+
+return res,err
 ```
