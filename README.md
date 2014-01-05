@@ -3,6 +3,16 @@ Aero
 
 This library provides backoff rules and rate limiting (similar to time.Ticker) to aid in making nice networked clients. Also, chainable http.RoundTrippers are provided for both to provide that functionality at the network level.
 
+To **install** Aero, use `go get`:
+
+    go get github.com/mceldeen/aero
+
+This will then make the following packages available to you:
+
+    github.com/mceldeen/aero/backoff
+    github.com/mceldeen/aero/ratelimit
+
+
 Backoff
 ----------
 
