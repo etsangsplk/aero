@@ -1,17 +1,17 @@
 package ratelimit
 
-import (
-    "time"
-)
+import "time"
 
 type RateLimiter interface {
     Tick() <-chan time.Time
     Stop()
+    Clone() RateLimiter
 }
 
 type Bursty struct {
     c   chan time.Time
     n   int
+    b   int
     t   time.Duration
     cls chan bool
 }
@@ -22,11 +22,16 @@ func NewBursty(num int, unit time.Duration, burst int) *Bursty {
         cls: make(chan bool, 1),
         n:   num,
         t:   unit,
+        b:   burst,
     }
 
     l.start(burst)
 
     return l
+}
+
+func (l *Bursty) Clone() RateLimiter {
+    return NewBursty(l.n, l.t, l.b)
 }
 
 func (l *Bursty) Tick() <-chan time.Time {

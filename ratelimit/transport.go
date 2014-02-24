@@ -1,30 +1,35 @@
 package ratelimit
 
 import "net/http"
+import "fmt"
 
-type LimitProducer func() RateLimiter
+type KeyFunc func(*http.Request) string
 
 // Host based rate limiting
 type HttpTransport struct {
     Transport http.RoundTripper
+    KeyFunc   KeyFunc
 
-    p   LimitProducer
+    p   RateLimiter
     q   map[string]*rateQueue
 }
 
-func NewHttpTransport(p LimitProducer) *HttpTransport {
+func NewHttpTransport(p RateLimiter) *HttpTransport {
     return &HttpTransport{
         Transport: http.DefaultTransport,
         p:         p,
         q:         make(map[string]*rateQueue, 10),
+        KeyFunc: func(req *http.Request) string {
+            return req.URL.Host
+        },
     }
 }
 
 func (t *HttpTransport) RoundTrip(req *http.Request) (res *http.Response, err error) {
-    q, ok := t.q[req.URL.Host]
+    q, ok := t.q[t.KeyFunc(req)]
     if !ok {
         q = &rateQueue{
-            l:         t.p(),
+            l:         t.p.Clone(),
             treq:      make(chan *treq, 100),
             Transport: t.Transport,
         }
