@@ -1,7 +1,6 @@
 package ratelimit
 
 import "net/http"
-import "fmt"
 
 type KeyFunc func(*http.Request) string
 
